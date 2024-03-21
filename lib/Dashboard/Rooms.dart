@@ -15,50 +15,62 @@ class _RoomsPageState extends State<RoomsPage> {
   @override
   Widget build(BuildContext context) {
     return DashboardPage(
+      heading: 'Rooms',
       title: "Dashboard",
-      child: Container(
-        width: double.infinity,
-        color: Colors.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 25,
-            ),
-            Container(
-              padding: EdgeInsets.only(
-                left: 28,
-                right: 28,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              RoomPage(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/Lights');
+                },
+                image: "images/tv.png",
+                room: 'Living Room',
+                conditon: 'On',
               ),
-              child: Text(
-                "Rooms",
-                style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700),
+              SizedBox(
+                width: 50,
               ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 28),
-              child: Column(
-                children: [
-                  RoomPage(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/Lights');
-                    },
-                    image: "images/tv.png",
-                    room: 'Living Room',
-                    conditon: 'On',
-                  ),
-                ],
+              RoomPage(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/Lights');
+                },
+                image: "images/bed.png",
+                room: 'Bedroom',
+                conditon: 'On',
               ),
-            )
-          ],
-        ),
+            ],
+          ),
+          SizedBox(
+            height: 50,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              RoomPage(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/Lights');
+                },
+                image: "images/Kitchen.png",
+                room: 'Kitchen',
+                conditon: 'On',
+              ),
+              SizedBox(
+                width: 50,
+              ),
+              RoomPage(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/Lights');
+                },
+                image: "images/bath.png",
+                room: 'Bathroom',
+                conditon: 'On',
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

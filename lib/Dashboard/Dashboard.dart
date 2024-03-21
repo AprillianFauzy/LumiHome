@@ -4,9 +4,11 @@ class DashboardPage extends StatefulWidget {
   const DashboardPage({
     super.key,
     required this.title,
+    required this.heading,
     this.child,
   });
   final String title;
+  final String heading;
   final Widget? child;
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -42,7 +44,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             ),
                             IconButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, '/Rooms');
+                                Navigator.pushNamed(context, '/Profile');
                               },
                               icon: Image.asset(
                                 'images/setting.png',
@@ -89,7 +91,39 @@ class _DashboardPageState extends State<DashboardPage> {
                       child: Container(
                         width: double.infinity,
                         color: Colors.white,
-                        child: widget.child,
+                        child: Container(
+                          width: double.infinity,
+                          color: Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: 25,
+                              ),
+                              Container(
+                                padding: EdgeInsets.only(
+                                  left: 28,
+                                  right: 28,
+                                ),
+                                child: Text(
+                                  widget.heading,
+                                  style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(horizontal: 28),
+                                child: widget.child,
+                              )
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
