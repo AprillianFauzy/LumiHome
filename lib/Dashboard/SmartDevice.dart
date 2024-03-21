@@ -28,7 +28,7 @@ class _SmartDeviceState extends State<SmartDevice> {
           ),
           Door(
             onTap: () {
-              Navigator.pushNamed(context, "/Lights");
+              Navigator.pushNamed(context, "/DoorDetails");
             },
           ),
         ],

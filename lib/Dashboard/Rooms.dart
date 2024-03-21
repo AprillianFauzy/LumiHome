@@ -24,7 +24,7 @@ class _RoomsPageState extends State<RoomsPage> {
             children: [
               RoomPage(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/Lights');
+                  Navigator.pushNamed(context, '/LightDetails');
                 },
                 image: "images/tv.png",
                 room: 'Living Room',

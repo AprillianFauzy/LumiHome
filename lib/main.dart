@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lumihome/Autentification/Auth.dart';
 import 'package:lumihome/Dashboard/Rooms.dart';
 import 'package:lumihome/Dashboard/SmartDevice.dart';
+import 'package:lumihome/Door/Door_Details.dart';
+import 'package:lumihome/Light/Light_Details.dart';
 import 'package:lumihome/Profile/Data_profile/Account.dart';
 import 'package:lumihome/Profile/Data_profile/Change_Password.dart';
 import 'package:lumihome/Profile/Data_profile/Personal_Information.dart';
@@ -28,6 +30,8 @@ class MyApp extends StatelessWidget {
         '/PersonalInformation': (context) => PersonalInformation(),
         '/Account': (context) => Account(),
         '/ChangePassword': (context) => ChangePassword(),
+        '/LightDetails': (context) => LightDetails(),
+        '/DoorDetails': (context) => DoorDetails(),
       },
     );
   }
