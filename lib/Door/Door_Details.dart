@@ -77,14 +77,14 @@ class _DoorDetailsState extends State<DoorDetails> {
                             )
                           : _isOpen
                               ? Container(
-                                  width: 300, // Set desired width
+                                  width: 200, // Set desired width
                                   child: Image.asset(
                                     'images/DoorClose.png',
                                     fit: BoxFit.contain,
                                   ),
                                 )
                               : Container(
-                                  width: 206, // Set desired width
+                                  width: 300, // Set desired width
                                   child: Image.asset(
                                     'images/DoorOpen.png',
                                     fit: BoxFit.contain,
