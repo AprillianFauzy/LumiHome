@@ -50,7 +50,7 @@ class _LightsState extends State<Lights> {
       'led3': newValue ? 1 : 0,
       'led4': newValue ? 1 : 0,
     });
-    _loadSwitchState();
+    await _loadSwitchState();
   }
 
   @override
@@ -60,12 +60,18 @@ class _LightsState extends State<Lights> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20.0),
         child: Container(
+          decoration: BoxDecoration(
+            color: Color(0xFF619EF5),
+            image: DecorationImage(
+              image: AssetImage('images/map.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
           constraints: const BoxConstraints(
             minWidth: 270.0,
             maxWidth: 350.0,
           ),
           padding: EdgeInsets.symmetric(horizontal: 20),
-          color: Color(0xFF619EF5),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -129,11 +135,11 @@ class _LightsState extends State<Lights> {
                     ),
                     Switch.adaptive(
                       value: _lightsStatus.values.every((status) => status),
-                      onChanged: (newValue) {
+                      onChanged: (newValue) async {
                         setState(() {
                           _lightsStatus.updateAll((key, value) => newValue);
                         });
-                        _updateSwitchState(newValue);
+                        await _updateSwitchState(newValue);
                       },
                       activeTrackColor: Colors.white30,
                       activeColor: Colors.white,

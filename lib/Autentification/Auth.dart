@@ -13,7 +13,6 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
-    // container
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -57,28 +56,42 @@ class _AuthPageState extends State<AuthPage> {
                             showModalBottomSheet(
                               backgroundColor: Color(0xff619EF5),
                               context: context,
-                              isScrollControlled:
-                                  true, // Ensure scrolling if needed
+                              isScrollControlled: true,
                               builder: (BuildContext context) {
-                                return SingleChildScrollView(
-                                  // Allow scrolling when keyboard appears
-                                  child: Padding(
-                                    // Add padding for bottom safety
-                                    padding: EdgeInsets.only(
-                                        bottom: MediaQuery.of(context)
-                                            .viewInsets
-                                            .bottom),
-                                    child: Column(
-                                      children: [SignUpPage()],
-                                    ),
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20.0),
+                                    topRight: Radius.circular(20.0),
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      // Background Image
+                                      Positioned.fill(
+                                        child: Image.asset(
+                                          'images/batik.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      // Content
+                                      SingleChildScrollView(
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            bottom: MediaQuery.of(context)
+                                                .viewInsets
+                                                .bottom,
+                                          ),
+                                          child: Column(
+                                            children: [SignUpPage()],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 );
                               },
-                              // Disable resize to avoid unwanted content adjustments
                             );
                           },
                         ),
-
                         const SizedBox(
                           height: 15,
                         ),
@@ -122,24 +135,39 @@ class _AuthPageState extends State<AuthPage> {
                             showModalBottomSheet(
                               backgroundColor: Color(0xff619EF5),
                               context: context,
-                              isScrollControlled:
-                                  true, // Ensure scrolling if needed
+                              isScrollControlled: true,
                               builder: (BuildContext context) {
-                                return SingleChildScrollView(
-                                  // Allow scrolling when keyboard appears
-                                  child: Padding(
-                                    // Add padding for bottom safety
-                                    padding: EdgeInsets.only(
-                                        bottom: MediaQuery.of(context)
-                                            .viewInsets
-                                            .bottom),
-                                    child: Column(
-                                      children: [LoginPage()],
-                                    ),
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20.0),
+                                    topRight: Radius.circular(20.0),
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      // Background Image
+                                      Positioned.fill(
+                                        child: Image.asset(
+                                          'images/batik.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      // Content
+                                      SingleChildScrollView(
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            bottom: MediaQuery.of(context)
+                                                .viewInsets
+                                                .bottom,
+                                          ),
+                                          child: Column(
+                                            children: [LoginPage()],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 );
                               },
-                              // Disable resize to avoid unwanted content adjustments
                             );
                           },
                           type: ButtonType.secondary,

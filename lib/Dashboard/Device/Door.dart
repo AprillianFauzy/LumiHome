@@ -6,6 +6,7 @@ class Door extends StatefulWidget {
     required this.onTap,
   });
   final VoidCallback onTap;
+
   @override
   State<Door> createState() => _DoorState();
 }
@@ -24,7 +25,13 @@ class _DoorState extends State<Door> {
             maxWidth: 350.0,
           ),
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          color: Color(0xFF619EF5),
+          decoration: BoxDecoration(
+            color: Color(0xFF619EF5),
+            image: DecorationImage(
+              image: AssetImage('images/map.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
           child: Row(children: [
             Image.asset(
               'images/Door.png',
@@ -33,28 +40,29 @@ class _DoorState extends State<Door> {
             Spacer(),
             Container(
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Door",
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Door",
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                      color: Colors.white,
                     ),
-                    Text(
-                      "Unlock",
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                        color: Colors.white,
-                      ),
+                  ),
+                  Text(
+                    "Unlock",
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                      color: Colors.white,
                     ),
-                  ]),
+                  ),
+                ],
+              ),
             ),
             Spacer(),
             SizedBox(

@@ -80,6 +80,8 @@ flutter:
         - images/LampON.png
         - images/LampOFF.png
         - images/backW.png
+        - images/batik.png
+        - images/map.png
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/assets-and-images/#resolution-aware

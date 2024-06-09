@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:lumihome/Profile/Component/mytextfield.dart';
 
@@ -14,107 +15,61 @@ class _AccountState extends State<Account> {
   final emailController = TextEditingController();
   User? user;
   bool _isLoading = true;
+  final databaseReference = FirebaseDatabase.instance.ref();
 
   @override
   void initState() {
     super.initState();
-    _getCurrentUser();
+    fetchUserData();
   }
 
-  Future<void> _getCurrentUser() async {
-    user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      emailController.text = user!.email ?? '';
-    }
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _updateEmail() async {
+  Future<void> fetchUserData() async {
     try {
-      if (user != null && !user!.emailVerified) {
-        await user!.sendEmailVerification();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              'Please verify your current email before changing it. A verification email has been sent.'),
-        ));
-        return;
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null) {
+        final snapshot = await databaseReference.child('users/$uid').get();
+        if (snapshot.exists) {
+          final data = snapshot.value as Map;
+          emailController.text = data['email'] ?? '';
+          user = FirebaseAuth.instance.currentUser;
+        }
       }
-
-      String newEmail = emailController.text;
-
-      if (user!.email != newEmail) {
-        // Re-authenticate the user to update the email
-        await _reauthenticateUser();
-
-        await user!.updateEmail(newEmail);
-        await user!.sendEmailVerification();
-
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content:
-              Text('Email updated successfully! Please verify your new email.'),
-        ));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Email address remains the same.'),
-        ));
-      }
-    } on FirebaseAuthException catch (e) {
-      print(e.message);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Failed to update email: ${e.message}'),
-      ));
+    } catch (error) {
+      print('Failed to load user data: $error');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
-  Future<void> _reauthenticateUser() async {
-    try {
-      String password = await _showPasswordDialog();
-
-      AuthCredential credential = EmailAuthProvider.credential(
-        email: user!.email!,
-        password: password,
+  Future<void> sendVerificationEmail() async {
+    if (user != null && !user!.emailVerified) {
+      await user!.sendEmailVerification();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Verification Email Send')),
       );
-      await user!.reauthenticateWithCredential(credential);
-    } on FirebaseAuthException catch (e) {
-      print(e.message);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Re-authentication failed: ${e.message}'),
-      ));
     }
   }
 
-  Future<String> _showPasswordDialog() async {
-    String password = '';
-    await showDialog(
+  void showAlertDialog() {
+    showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Re-authenticate'),
-        content: TextField(
-          obscureText: true,
-          decoration: InputDecoration(labelText: 'Enter your password'),
-          onChanged: (value) {
-            password = value;
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(password);
-            },
-            child: Text('Confirm'),
-          ),
-        ],
-      ),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Email Not Verified"),
+          content: Text("Please verify your email to proceed."),
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
-    return password;
   }
 
   @override
@@ -176,84 +131,36 @@ class _AccountState extends State<Account> {
                     ),
                   Container(
                     alignment: Alignment.topRight,
-                    child: isEditing
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 10),
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    isEditing = false;
-                                  });
-                                },
-                                child: Text(
-                                  "Cancel",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Poppins',
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFF619EF5),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 10),
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    isEditing = false;
-                                  });
-                                  _updateEmail();
-                                },
-                                child: Text(
-                                  "Save",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Poppins',
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        : ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF619EF5),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 10),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                isEditing = true;
-                              });
-                            },
-                            child: Text(
-                              "Update",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'Poppins',
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                  )
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF619EF5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      ),
+                      onPressed: () async {
+                        if (user != null && !user!.emailVerified) {
+                          sendVerificationEmail();
+                        } else if (user != null && user!.emailVerified) {
+                          setState(() {
+                            isEditing = !isEditing;
+                          });
+                        } else {
+                          showAlertDialog();
+                        }
+                      },
+                      child: Text(
+                        "Send Email",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
