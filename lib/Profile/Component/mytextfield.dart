@@ -9,6 +9,8 @@ class MyTextField extends StatefulWidget {
     required this.value,
     required this.controller,
     this.fieldType = FieldType.normal,
+    this.readonly = false,
+    this.obscureText = false,
     Key? key,
   }) : super(key: key);
 
@@ -17,13 +19,14 @@ class MyTextField extends StatefulWidget {
   final String text;
   final TextEditingController controller;
   final FieldType fieldType;
+  final bool readonly;
+  final bool? obscureText;
 
   @override
   State<MyTextField> createState() => _MyTextFieldState();
 }
 
 class _MyTextFieldState extends State<MyTextField> {
-  String _passwordValue = '';
   bool _passwordVisible = false;
 
   @override
@@ -48,13 +51,8 @@ class _MyTextFieldState extends State<MyTextField> {
         ),
         SizedBox(height: 8),
         TextField(
-          enabled: true,
+          readOnly: widget.readonly,
           controller: widget.controller,
-          onChanged: (value) {
-            setState(() {
-              _passwordValue = value;
-            });
-          },
           obscureText:
               widget.fieldType == FieldType.password && !_passwordVisible,
           decoration: InputDecoration(

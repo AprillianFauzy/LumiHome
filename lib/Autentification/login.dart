@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lumihome/Components/Button.dart';
 import 'package:lumihome/Components/TextField.dart';
+import 'package:lumihome/DatabaseService.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,6 +11,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -45,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 5,
               ),
-              MyTextField(label: "Email Address"),
+              MyTextField(controller: emailController, label: "Email Address"),
             ],
           ),
           SizedBox(
@@ -65,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 5,
               ),
-              MyPassword(label: "Password"),
+              MyPassword(controller: passwordController, label: "Password"),
             ],
           ),
           SizedBox(
@@ -73,8 +77,22 @@ class _LoginPageState extends State<LoginPage> {
           ),
           MyButton(
             text: "Sign In",
-            onTap: () {
-              Navigator.pushNamed(context, '/Dashboard');
+            onTap: () async {
+              // Attempt to login using the provided credentials
+              final result = await DatabaseService.loginUser(
+                  emailController.text, passwordController.text);
+
+              // Check if login was successful
+              if (result) {
+                // Navigate to the dashboard page
+                Navigator.pushNamed(context, '/Dashboard');
+              } else {
+                // Display an error message indicating failed login
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Login failed. Please check your credentials.'),
+                  backgroundColor: Colors.red,
+                ));
+              }
             },
             type: ButtonType.primary,
             bgColor: Colors.white,

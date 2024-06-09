@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "922488826046",
+    "project_id": "lumi-home-f1cca",
+    "storage_bucket": "lumi-home-f1cca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:922488826046:android:d2eeb8d67ec532f07456ef",
+        "android_client_info": {
+          "package_name": "com.example.lumihome"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDH4pOpkx2zVkzma0xj4IqSIlTxbO10P4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

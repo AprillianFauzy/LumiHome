@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lumihome/Dashboard/Dashboard.dart';
 import 'package:lumihome/Dashboard/Rooms/Room.dart';
+import 'package:lumihome/Light/Light_Details.dart';
 
 class RoomsPage extends StatefulWidget {
   const RoomsPage({
@@ -24,7 +25,14 @@ class _RoomsPageState extends State<RoomsPage> {
             children: [
               RoomPage(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/LightDetails');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LightDetails(
+                              room: 'Living Room',
+                              led: '1',
+                            )),
+                  );
                 },
                 image: "images/tv.png",
                 room: 'Living Room',
@@ -35,7 +43,14 @@ class _RoomsPageState extends State<RoomsPage> {
               ),
               RoomPage(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/Lights');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LightDetails(
+                              room: 'Bedroom',
+                              led: '2',
+                            )),
+                  );
                 },
                 image: "images/bed.png",
                 room: 'Bedroom',
@@ -51,7 +66,14 @@ class _RoomsPageState extends State<RoomsPage> {
             children: [
               RoomPage(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/Lights');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LightDetails(
+                              room: 'Kitchen',
+                              led: '3',
+                            )),
+                  );
                 },
                 image: "images/Kitchen.png",
                 room: 'Kitchen',
@@ -62,7 +84,14 @@ class _RoomsPageState extends State<RoomsPage> {
               ),
               RoomPage(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/Lights');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LightDetails(
+                              room: 'Bathroom',
+                              led: '4',
+                            )),
+                  );
                 },
                 image: "images/bath.png",
                 room: 'Bathroom',

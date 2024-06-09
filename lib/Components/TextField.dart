@@ -4,16 +4,22 @@ class MyTextField extends StatelessWidget {
   const MyTextField({
     super.key,
     required this.label,
+    this.controller,
+    this.validator,
   });
 
   final String label;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 255,
       height: 45,
-      child: TextField(
+      child: TextFormField(
+        validator: validator,
+        controller: controller,
         decoration: InputDecoration(
           labelText: label,
           contentPadding:
@@ -39,9 +45,13 @@ class MyPassword extends StatefulWidget {
   const MyPassword({
     super.key,
     required this.label,
+    this.controller,
+    this.validator,
   });
 
   final String label;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
 
   @override
   _MyPasswordState createState() => _MyPasswordState();
@@ -55,7 +65,9 @@ class _MyPasswordState extends State<MyPassword> {
     return SizedBox(
       width: 255,
       height: 45,
-      child: TextField(
+      child: TextFormField(
+        validator: widget.validator,
+        controller: widget.controller,
         obscureText: !_isPasswordVisible,
         decoration: InputDecoration(
           labelText: widget.label,

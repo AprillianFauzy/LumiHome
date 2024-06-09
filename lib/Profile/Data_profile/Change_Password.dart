@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lumihome/Profile/Component/mytextfield.dart';
 
@@ -8,12 +9,51 @@ class ChangePassword extends StatefulWidget {
   State<ChangePassword> createState() => _ChangePasswordState();
 }
 
-final nameController = TextEditingController(); // Initial value for name
-final addressController = TextEditingController(); // Initial value for address
-final birthController = TextEditingController(); // Initial value for birth
-final phoneController = TextEditingController(); // Initial value for phone
+final currentPasswordController = TextEditingController();
+final newPasswordController = TextEditingController();
+final confirmPasswordController = TextEditingController();
 
 class _ChangePasswordState extends State<ChangePassword> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  void _changePassword() async {
+    if (newPasswordController.text != confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("New passwords do not match")),
+      );
+      return;
+    }
+
+    try {
+      User? user = _auth.currentUser;
+      String email = user?.email ?? '';
+
+      // Re-authenticate the user
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: email,
+        password: currentPasswordController.text,
+      );
+
+      await user?.reauthenticateWithCredential(credential);
+
+      // Change the password
+      await user?.updatePassword(newPasswordController.text);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Password changed successfully")),
+      );
+
+      // Clear the text fields
+      currentPasswordController.clear();
+      newPasswordController.clear();
+      confirmPasswordController.clear();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to change password: $e")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -56,8 +96,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                 alignment: Alignment.topLeft,
                 child: MyTextField(
                     text: "Current Password",
-                    labelText: 'Enter Your Password',
-                    controller: nameController,
+                    labelText: 'Enter Your Current Password',
+                    controller: currentPasswordController,
                     value: "",
                     fieldType: FieldType.password),
               ),
@@ -69,7 +109,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                 child: MyTextField(
                   labelText: 'Enter New Password',
                   text: "New Password",
-                  controller: addressController,
+                  controller: newPasswordController,
                   value: "",
                   fieldType: FieldType.password,
                 ),
@@ -82,7 +122,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                 child: MyTextField(
                   labelText: 'Re-Password',
                   text: "Re-Password",
-                  controller: phoneController,
+                  controller: confirmPasswordController,
                   value: "",
                   fieldType: FieldType.password,
                 ),
@@ -102,9 +142,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                         vertical: 10,
                         horizontal: 10), // Tambahkan padding di sini
                   ),
-                  onPressed: () {
-                    print('Update button pressed!');
-                  },
+                  onPressed: _changePassword,
                   child: Text(
                     "Update",
                     style: TextStyle(

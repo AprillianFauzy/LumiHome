@@ -1,17 +1,58 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class Lights extends StatefulWidget {
   const Lights({
-    super.key,
+    Key? key,
     required this.onTap,
-  });
+  }) : super(key: key);
+
   final VoidCallback onTap;
+
   @override
   State<Lights> createState() => _LightsState();
 }
 
 class _LightsState extends State<Lights> {
-  bool _isOn = false;
+  final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
+  Map<String, bool> _lightsStatus = {
+    'Living Room': false,
+    'Bedroom': false,
+    'Kitchen': false,
+    'Bathroom': false,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSwitchState();
+  }
+
+  Future<void> _loadSwitchState() async {
+    final DatabaseEvent event = await _dbRef.child('/ESP32').once();
+    if (event.snapshot.value != null) {
+      final data = event.snapshot.value as Map<dynamic, dynamic>;
+      setState(() {
+        _lightsStatus = {
+          'Living Room': data['led1'] == 1,
+          'Bedroom': data['led2'] == 1,
+          'Kitchen': data['led3'] == 1,
+          'Bathroom': data['led4'] == 1,
+        };
+      });
+    }
+  }
+
+  Future<void> _updateSwitchState(bool newValue) async {
+    await _dbRef.child('/ESP32').update({
+      'led1': newValue ? 1 : 0,
+      'led2': newValue ? 1 : 0,
+      'led3': newValue ? 1 : 0,
+      'led4': newValue ? 1 : 0,
+    });
+    _loadSwitchState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -41,10 +82,11 @@ class _LightsState extends State<Lights> {
                     Text(
                       "Lights",
                       style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white),
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
                     ),
                     SizedBox(
                       height: 10,
@@ -52,111 +94,28 @@ class _LightsState extends State<Lights> {
                     Text(
                       "Status Devices",
                       style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white),
+                        fontFamily: 'Poppins',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                     SizedBox(
                       height: 8,
                     ),
-                    Container(
-                      width: 110,
-                      child: Row(children: [
-                        Text(
-                          "Living Room",
-                          style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
-                        ),
-                        Spacer(),
-                        Text(
-                          "On",
-                          style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
-                        ),
-                      ]),
-                    ),
+                    _buildStatusRow("Living Room"),
                     SizedBox(
                       height: 3,
                     ),
-                    Container(
-                      width: 110,
-                      child: Row(children: [
-                        Text(
-                          "Bedroom",
-                          style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
-                        ),
-                        Spacer(),
-                        Text(
-                          "On",
-                          style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
-                        ),
-                      ]),
-                    ),
+                    _buildStatusRow("Bedroom"),
                     SizedBox(
                       height: 3,
                     ),
-                    Container(
-                      width: 110,
-                      child: Row(children: [
-                        Text(
-                          "Kitchen",
-                          style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
-                        ),
-                        Spacer(),
-                        Text(
-                          "On",
-                          style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
-                        ),
-                      ]),
-                    ),
+                    _buildStatusRow("Kitchen"),
                     SizedBox(
                       height: 3,
                     ),
-                    Container(
-                      width: 110,
-                      child: Row(children: [
-                        Text(
-                          "Bathroom",
-                          style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
-                        ),
-                        Spacer(),
-                        Text(
-                          "On",
-                          style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
-                        ),
-                      ]),
-                    ),
+                    _buildStatusRow("Bathroom"),
                   ],
                 ),
               ),
@@ -169,21 +128,22 @@ class _LightsState extends State<Lights> {
                       height: 40,
                     ),
                     Switch.adaptive(
-                      value:
-                          _isOn, // Boolean value representing the current state (on or off)
+                      value: _lightsStatus.values.every((status) => status),
                       onChanged: (newValue) {
                         setState(() {
-                          _isOn = newValue;
+                          _lightsStatus.updateAll((key, value) => newValue);
                         });
+                        _updateSwitchState(newValue);
                       },
                       activeTrackColor: Colors.white30,
-
                       activeColor: Colors.white,
                       inactiveTrackColor: Colors.white30,
                       inactiveThumbColor: Colors.white,
                     ),
                     Text(
-                      "On",
+                      _lightsStatus.values.every((status) => status)
+                          ? "On"
+                          : "Off",
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w900,
@@ -197,6 +157,35 @@ class _LightsState extends State<Lights> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildStatusRow(String room) {
+    return Container(
+      width: 110,
+      child: Row(
+        children: [
+          Text(
+            room,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+            ),
+          ),
+          Spacer(),
+          Text(
+            _lightsStatus[room]! ? "On" : "Off",
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+            ),
+          ),
+        ],
       ),
     );
   }

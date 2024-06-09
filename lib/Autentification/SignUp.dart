@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lumihome/Components/Button.dart';
 import 'package:lumihome/Components/TextField.dart';
+import 'package:lumihome/DatabaseService.dart';
+import 'package:lumihome/Model.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -10,6 +12,11 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  final _fullNameController = TextEditingController();
+  final _phoneNumberController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -44,7 +51,10 @@ class _SignUpPageState extends State<SignUpPage> {
               SizedBox(
                 height: 5,
               ),
-              MyTextField(label: "Full Name"),
+              MyTextField(
+                controller: _fullNameController,
+                label: "Full Name",
+              ),
             ],
           ),
           SizedBox(
@@ -64,7 +74,10 @@ class _SignUpPageState extends State<SignUpPage> {
               SizedBox(
                 height: 5,
               ),
-              MyTextField(label: "Phone Number"),
+              MyTextField(
+                controller: _phoneNumberController,
+                label: "Phone Number",
+              ),
             ],
           ),
           SizedBox(
@@ -84,7 +97,10 @@ class _SignUpPageState extends State<SignUpPage> {
               SizedBox(
                 height: 5,
               ),
-              MyTextField(label: "Email Address"),
+              MyTextField(
+                controller: _emailController,
+                label: "Email Address",
+              ),
             ],
           ),
           SizedBox(
@@ -104,7 +120,10 @@ class _SignUpPageState extends State<SignUpPage> {
               SizedBox(
                 height: 5,
               ),
-              MyPassword(label: "Password"),
+              MyPassword(
+                controller: _passwordController,
+                label: "Password",
+              ),
             ],
           ),
           const SizedBox(
@@ -112,7 +131,16 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
           MyButton(
             text: "Sign Up",
-            onTap: () {},
+            onTap: () {
+              final email = _emailController.text.trim();
+              final password = _passwordController.text.trim();
+              final userdata = RegisterUser(
+                fullName: _fullNameController.text.trim(),
+                phoneNumber: _phoneNumberController.text.trim(),
+              );
+
+              DatabaseService().register(context, userdata, email, password);
+            },
             type: ButtonType.primary,
             bgColor: Colors.white,
             textColor: Color(0xff619EF5),

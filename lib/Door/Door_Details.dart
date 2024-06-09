@@ -1,6 +1,7 @@
-import 'dart:async'; // Import for Timer
+import 'dart:async';
 import 'dart:math';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class DoorDetails extends StatefulWidget {
@@ -13,7 +14,36 @@ class DoorDetails extends StatefulWidget {
 class _DoorDetailsState extends State<DoorDetails> {
   bool _isOpen = false;
   bool _isLoading = false;
-  double _rotationAngle = 0.0; // Variable for rotation angle
+  double _rotationAngle = 0.0;
+  final DatabaseReference _doorStatusRef =
+      FirebaseDatabase.instance.ref('/ESP32');
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDoorStatus();
+  }
+
+  void _fetchDoorStatus() {
+    _doorStatusRef.onValue.listen((event) {
+      final data = event.snapshot.value as Map;
+      setState(() {
+        _isOpen = data['open'] ?? false;
+      });
+    });
+  }
+
+  void _updateDoorStatus(bool isOpen) async {
+    try {
+      await _doorStatusRef.update({
+        'open': !isOpen,
+        'lock': isOpen,
+      });
+    } catch (error) {
+      // Handle update error (e.g., show a snackbar)
+      print("Error updating door status: $error");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +53,15 @@ class _DoorDetailsState extends State<DoorDetails> {
         body: Column(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.only(
+              borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(40.0),
                   bottomRight: Radius.circular(40.0)),
               child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: 25, horizontal: 15),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 25, horizontal: 15),
                 height: 600,
-                color: Color(0xFF619EF5),
+                color: const Color(0xFF619EF5),
                 child: Column(
                   children: [
                     Row(
@@ -40,26 +71,26 @@ class _DoorDetailsState extends State<DoorDetails> {
                             Navigator.pop(context);
                           },
                           icon: Image.asset(
-                            'images/Back.png',
+                            'images/backW.png',
                             width: 24,
                           ),
                         ),
-                        Spacer(),
-                        Text(
+                        const Spacer(),
+                        const Text(
                           'Main Door',
                           style: TextStyle(
                               fontFamily: 'Poppins',
-                              color: Colors.black,
+                              color: Colors.white,
                               fontWeight: FontWeight.w700,
                               fontSize: 24),
                         ),
-                        Spacer(),
+                        const Spacer(),
                         Container(
                           width: 45,
                         )
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 25,
                     ),
                     AnimatedSwitcher(
@@ -70,21 +101,21 @@ class _DoorDetailsState extends State<DoorDetails> {
                               transform: Matrix4.identity()
                                 ..rotateZ(_rotationAngle),
                               child: Container(
-                                height: 405, // Set desired height here
+                                height: 405,
                                 child: Image.asset('images/Loader.png',
                                     width: 200),
                               ),
                             )
                           : _isOpen
                               ? Container(
-                                  width: 200, // Set desired width
+                                  width: 200,
                                   child: Image.asset(
                                     'images/DoorClose.png',
                                     fit: BoxFit.contain,
                                   ),
                                 )
                               : Container(
-                                  width: 300, // Set desired width
+                                  width: 300,
                                   child: Image.asset(
                                     'images/DoorOpen.png',
                                     fit: BoxFit.contain,
@@ -95,9 +126,9 @@ class _DoorDetailsState extends State<DoorDetails> {
                       _isLoading
                           ? 'Loading...'
                           : _isOpen
-                              ? 'Unlock'
-                              : 'Locked',
-                      style: TextStyle(
+                              ? 'Locked'
+                              : 'Unlock',
+                      style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
@@ -120,21 +151,23 @@ class _DoorDetailsState extends State<DoorDetails> {
                         setState(() {
                           _isLoading = true;
                           _startRotation();
-                          Future.delayed(const Duration(seconds: 2), () {
-                            setState(() {
-                              _isOpen = value;
-                              _isLoading = false;
-                              _rotationAngle = 0.0;
-                            });
+                        });
+                        Future.delayed(const Duration(seconds: 2), () {
+                          setState(() {
+                            _isOpen = value;
+                            _isLoading = false;
+                            _rotationAngle = 0.0;
                           });
                         });
+                        // Update Firebase after UI update is complete
+                        _updateDoorStatus(value);
                       },
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 25,
                   ),
-                  Text(
+                  const Text(
                     "Swipe to unlock",
                     style: TextStyle(
                       fontFamily: 'Poppins',
@@ -148,23 +181,19 @@ class _DoorDetailsState extends State<DoorDetails> {
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: Positioned(
-                // Your Positioned widget here
-                bottom: 0.0,
-                child: Container(
-                  padding: EdgeInsets.only(bottom: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/Dashboard');
-                    },
-                    child: Image.asset(
-                      'images/logo.png',
-                      height: 45,
-                    ),
+              child: Container(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/Dashboard');
+                  },
+                  child: Image.asset(
+                    'images/logo.png',
+                    height: 45,
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -174,10 +203,9 @@ class _DoorDetailsState extends State<DoorDetails> {
   void _startRotation() {
     Timer.periodic(const Duration(milliseconds: 16), (timer) {
       setState(() {
-        _rotationAngle += 0.02; // Adjust for desired rotation speed
+        _rotationAngle += 0.02;
         if (_rotationAngle >= 2 * pi) {
-          // Check for full rotation
-          _rotationAngle = 0.0; // Reset after one full rotation
+          _rotationAngle = 0.0;
         }
       });
     });
