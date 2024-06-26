@@ -33,15 +33,29 @@ class _DoorDetailsState extends State<DoorDetails> {
     });
   }
 
-  void _updateDoorStatus(bool isOpen) async {
+  Future<void> _updateDoorStatus(bool isOpen) async {
+    setState(() {
+      _isLoading = true;
+      _startRotation();
+    });
+
     try {
       await _doorStatusRef.update({
         'open': !isOpen,
         'lock': isOpen,
       });
+      // Ensure that local state is updated after the Firebase update
+      setState(() {
+        _isOpen = !isOpen;
+      });
     } catch (error) {
-      // Handle update error (e.g., show a snackbar)
       print("Error updating door status: $error");
+      // Handle update error (e.g., show a snackbar)
+    } finally {
+      setState(() {
+        _isLoading = false;
+        _rotationAngle = 0.0;
+      });
     }
   }
 
@@ -108,16 +122,16 @@ class _DoorDetailsState extends State<DoorDetails> {
                             )
                           : _isOpen
                               ? Container(
-                                  width: 200,
+                                  width: 300,
                                   child: Image.asset(
-                                    'images/DoorClose.png',
+                                    'images/DoorOpen.png',
                                     fit: BoxFit.contain,
                                   ),
                                 )
                               : Container(
-                                  width: 300,
+                                  width: 205,
                                   child: Image.asset(
-                                    'images/DoorOpen.png',
+                                    'images/DoorClose.png',
                                     fit: BoxFit.contain,
                                   ),
                                 ),
@@ -126,8 +140,8 @@ class _DoorDetailsState extends State<DoorDetails> {
                       _isLoading
                           ? 'Loading...'
                           : _isOpen
-                              ? 'Locked'
-                              : 'Unlock',
+                              ? 'Unlocked'
+                              : 'Locked',
                       style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 20,
@@ -148,19 +162,7 @@ class _DoorDetailsState extends State<DoorDetails> {
                     child: Switch(
                       value: _isOpen,
                       onChanged: (value) {
-                        setState(() {
-                          _isLoading = true;
-                          _startRotation();
-                        });
-                        Future.delayed(const Duration(seconds: 2), () {
-                          setState(() {
-                            _isOpen = value;
-                            _isLoading = false;
-                            _rotationAngle = 0.0;
-                          });
-                        });
-                        // Update Firebase after UI update is complete
-                        _updateDoorStatus(value);
+                        _updateDoorStatus(_isOpen);
                       },
                     ),
                   ),
